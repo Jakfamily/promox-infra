@@ -15,6 +15,8 @@ Ce projet utilise OpenTofu pour gérer une infrastructure Proxmox, en séparant 
 - [OpenTofu](https://opentofu.org/)
 - Proxmox VE
 - Git
+- Accès SSH au serveur Proxmox
+- Les droits d'administration sur le serveur Proxmox
 
 ## Auteurs
 
@@ -31,6 +33,7 @@ Voici quelques ressources recommandées pour apprendre et approfondir vos connai
 ### Blogs
 
 - [Blog de Stéphane Robert](https://blog.stephane-robert.info/) - Un excellent blog pour apprendre les concepts d'infrastructure as code, y compris Terraform et ses bonnes pratiques.
+- [slash-root.fr](https://slash-root.fr/proxmox-template-debian12-avec-cloud-init/) - article pour la creation de template debian12 avec cloud-init
 
 ### Livres
 
