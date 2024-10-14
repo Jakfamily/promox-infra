@@ -1,0 +1,18 @@
+# Ignorer les fichiers d'état de Terraform
+*.tfstate
+*.tfstate.*
+
+# Ignorer les fichiers de verrouillage de Terraform
+.terraform/
+
+# Ignorer les fichiers de sortie Terraform
+*.tfvars
+
+# Ignorer les fichiers d'authentification ou sensibles
+*.pem
+*.key
+*.env
+
+# Ignorer les dossiers de cache et les fichiers temporaires
+*.tfplan
+.terraform.tfstate.backup
