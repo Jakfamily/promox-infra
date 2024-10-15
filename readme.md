@@ -37,7 +37,12 @@ Voici quelques ressources recommandées pour apprendre et approfondir vos connai
 
 ### Livres
 
-- **Terraform** - Collection ENI : Un livre complet de la collection ENI pour comprendre et maîtriser Terraform dans un contexte DevOps. Idéal pour approfondir la gestion d'infrastructure avec des exemples concrets.
+- **L’infrastructure as Code avec Terraform-Déployez votre infrastructure sur le Cloud** - Collection ENI : Un livre complet de la collection ENI pour comprendre et maîtriser Terraform dans un contexte DevOps. Idéal pour approfondir la gestion d'infrastructure avec des exemples concrets.
+
+### Video
+
+- [Jim's Garage](https://www.youtube.com/@Jims-Garage)
+- [Culture Linux](https://www.youtube.com/@culturelinux)
 
 ### Documentation Officielle
 
