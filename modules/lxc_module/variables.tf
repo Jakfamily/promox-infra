@@ -8,5 +8,6 @@ variable "lxc_list" {
     memory   = number
     disk     = number
     network  = string
+    ip       = string
   }))
 }

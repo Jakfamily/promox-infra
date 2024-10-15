@@ -10,7 +10,7 @@ terraform {
 resource "proxmox_lxc" "lxc" {
   for_each = var.lxc_list
 
-  hostname    = each.value.name
+  hostname    = replace(each.value.name, "[^a-zA-Z0-9-\\.]", "-")
   target_node = each.value.node
   clone       = each.value.template
   cores       = each.value.cores

@@ -8,5 +8,6 @@ variable "vm_list" {
     memory   = number
     disk     = number
     network  = string
+    ip       = string
   }))
 }
