@@ -27,7 +27,7 @@ resource "proxmox_vm_qemu" "vm" {
   }
 
   # Configuration de l'adresse IP statique
-  ipconfig0 = "ip=${each.value.ip}"
+  ipconfig0 = "ip=${each.value.ip}/24"
 
   network {
     # Configurer l'interface réseau

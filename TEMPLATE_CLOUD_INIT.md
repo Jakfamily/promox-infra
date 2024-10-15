@@ -78,7 +78,7 @@ variable "vm_list" {
 vm_list = {
   "vm1" = {
     name     = "VM1"
-    node     = "node1"
+    node     = "pve"
     template = "debian12-cloudinit"
     cores    = 2
     memory   = 2048
@@ -87,7 +87,7 @@ vm_list = {
   },
   "vm2" = {
     name     = "VM2"
-    node     = "node1"
+    node     = "pve"
     template = "debian12-cloudinit"
     cores    = 4
     memory   = 4096
