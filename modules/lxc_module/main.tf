@@ -1,14 +1,25 @@
+terraform {
+  required_providers {
+    proxmox = {
+      source = "Telmate/proxmox"
+    }
+  }
+}
+
+
 resource "proxmox_lxc" "lxc" {
   for_each = var.lxc_list
 
-  hostname = each.value.name
-  node     = each.value.node
-  template = each.value.template
-  cores    = each.value.cores
-  memory   = each.value.memory
+  hostname    = each.value.name
+  target_node = each.value.node
+  clone       = each.value.template
+  cores       = each.value.cores
+  memory      = each.value.memory
 
-  # Définir la taille du système de fichiers racine
-  rootfs = "${each.value.disk}G" # Utilisation de disk pour spécifier la taille
+  rootfs {
+    storage = "local-lvm"
+    size    = "${each.value.disk}G"
+  }
 
   network {
     # Configurer l'interface réseau
