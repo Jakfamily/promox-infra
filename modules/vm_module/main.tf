@@ -15,10 +15,15 @@ resource "proxmox_vm_qemu" "vm" {
   cores       = each.value.cores
   memory      = each.value.memory
 
-  disk {
-    size    = "${each.value.disk}G"
-    storage = "local-lvm"
-    type    = "scsi"
+  disks {
+    scsi {
+      scsi0 {
+        disk {
+          size    = each.value.disk
+          storage = "local-lvm"
+        }
+      }
+    }
   }
 
   # Configuration de l'adresse IP statique
