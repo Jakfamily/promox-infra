@@ -19,8 +19,3 @@ module "vm" {
   source  = "./modules/vm_module"
   vm_list = var.vm_list
 }
-
-module "lxc" {
-  source   = "./modules/lxc_module"
-  lxc_list = var.lxc_list
-}
