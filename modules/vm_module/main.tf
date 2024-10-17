@@ -34,4 +34,20 @@ resource "proxmox_vm_qemu" "vm" {
     model  = "virtio" # Modèle de la carte réseau
     bridge = each.value.network
   }
+  # Assurez-vous que la VM démarre au démarrage
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "null_resource" "start_vm" {
+  for_each = proxmox_vm_qemu.vm
+
+  triggers = {
+    vm_id = each.value.id
+  }
+
+  provisioner "local-exec" {
+    command = "pvesh create /nodes/${each.value.target_node}/qemu/${each.value.id}/status/start"
+  }
 }

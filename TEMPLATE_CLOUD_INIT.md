@@ -1,113 +1,94 @@
-# Documentation pour la création d'un Template Cloud-Init sur Proxmox
+# Documentation : Création d'un Template Cloud-Init sur Proxmox
 
-## Configurer l'image avec virt-customize
+## Introduction
 
-Installez le paquet nécessaire si ce n'est pas déjà fait :
+Cette documentation décrit les étapes nécessaires pour créer un template Cloud-Init sur Proxmox. Ce template permettra de déployer facilement des machines virtuelles (VM) avec des configurations personnalisées.
 
-```bash
-apt update
-apt install -y libguestfs-tools
-```
+## Prérequis
 
-Ensuite, utilisez `virt-customize` pour installer `qemu-guest-agent`, qui est nécessaire pour une meilleure intégration avec Proxmox :
+- Accès à une installation de Proxmox.
+- Une image ISO de Debian ou Ubuntu.
+- Connaissances de base sur l'interface Proxmox et les commandes Linux.
 
-```bash
-virt-customize -a debian-12-generic-amd64.qcow2 --install qemu-guest-agent
-```
+## Étapes de Création du Template
 
-## Créer la VM dans Proxmox
+### 1. Créer une Nouvelle VM
 
-Connectez-vous à votre serveur Proxmox et créez une nouvelle VM :
+1. Connectez-vous à l'interface Proxmox.
+2. Cliquez sur **Créer VM**.
+3. Configurez les spécifications de la VM :
+   - **Nom** : Choisissez un nom pour la VM.
+   - **Système d'exploitation** : Sélectionnez l'image ISO de Debian ou Ubuntu.
+   - **CPU, RAM et Disque** : Ajustez les ressources selon vos besoins.
 
-```bash
-qm create 666 --name debian12-cloudinit --net0 virtio,bridge=vmbr1 --scsihw virtio-scsi-single
-```
+### 2. Installer le Système d'Exploitation
 
-## Configurer le disque et les ressources
+1. Démarrez la VM et suivez le processus d'installation.
+2. Configurez les paramètres de base (utilisateur, mot de passe, etc.).
 
-Ajoutez le disque téléchargé et configurez-le comme suit :
+### 3. Installer Cloud-Init
 
-```bash
-qm set 666 --scsi0 local:0,iothread=1,backup=off,format=qcow2,import-from=/root/debian-12-generic-amd64.qcow2
-qm disk resize 666 scsi0 20G
-```
-
-Configurez également les ressources de la VM (CPU, RAM) :
+Après l'installation, connectez-vous à la VM et installez Cloud-Init :
 
 ```bash
-qm set 666 --cpu host --cores 2 --memory 4096
+sudo apt update
+sudo apt install cloud-init
 ```
 
-Ajoutez un disque Cloud-Init :
+### 4. Configurer Cloud-Init
+
+1. Modifiez le fichier de configuration de Cloud-Init :
 
 ```bash
-qm set 666 --ide2 local:cloudinit
-qm set 666 --agent enabled=1
+sudo nano /etc/cloud/cloud.cfg
 ```
 
-## Convertir la VM en Template
+2. Ajoutez ou modifiez les paramètres nécessaires pour votre configuration réseau.
 
-Enfin, convertissez la VM en template :
+### 5. Éteindre la VM
+
+Une fois la configuration terminée, éteignez la VM :
 
 ```bash
-qm template 666
+sudo shutdown now
 ```
 
-## Utilisation dans le Projet
+### 6. Convertir la VM en Template
 
-Une fois que vous avez créé le template Cloud-Init, vous pouvez l'utiliser dans votre projet Terraform pour déployer des machines virtuelles (VM) et des conteneurs LXC. Voici comment configurer votre fichier `variables.tf` pour utiliser le template créé.
+1. Dans l'interface Proxmox, faites un clic droit sur la VM.
+2. Sélectionnez **Convertir en modèle** (ou **Convert to Template**).
 
-### Exemple de Configuration de Variables Terraform
+## Utilisation du Template Cloud-Init
 
-Vous pouvez définir vos machines virtuelles et conteneurs LXC dans le fichier `variables.tf` comme suit :
+Après avoir créé le template, vous pouvez l'utiliser pour déployer de nouvelles VMs avec des configurations spécifiques.
+
+### Exemple de Configuration Terraform
+
+Voici un exemple de configuration Terraform pour créer une VM à partir de votre template Cloud-Init :
 
 ```hcl
-variable "vm_list" {
-  description = "Liste des machines virtuelles"
-  type = map(object({
-    name     = string
-    node     = string
-    template = string
-    cores    = number
-    memory   = number
-    disk     = number
-    network  = string
-  }))
-}
+resource "proxmox_vm_qemu" "vm" {
+  name        = "ma-nouvelle-vm"
+  target_node = "pve"  # Votre nœud Proxmox
+  clone       = "nom_du_template"  # Le nom de votre template Cloud-Init
+  cores       = 2
+  memory      = 2048
 
-vm_list = {
-  "vm1" = {
-    name     = "VM1"
-    node     = "pve"
-    template = "debian12-cloudinit"
-    cores    = 2
-    memory   = 2048
-    disk     = 20
-    network  = "vmbr0"
-  },
-  "vm2" = {
-    name     = "VM2"
-    node     = "pve"
-    template = "debian12-cloudinit"
-    cores    = 4
-    memory   = 4096
-    disk     = 30
-    network  = "vmbr0"
+  # Configuration de l'IP
+  ipconfig0 = "ip=192.168.1.100/24"  # Remplacez par l'IP souhaitée
+
+  network {
+    model  = "virtio"  # Modèle de la carte réseau
+    bridge = "vmbr0"   # Remplacez par le bon bridge
+  }
+
+  # Configuration de l'automatisation
+  provisioner "local-exec" {
+    command = "pvesh create /nodes/pve/qemu/${self.id}/status/start"
   }
 }
 ```
 
-### Déployer les VM et Conteneurs
+## Conclusion
 
-Avec la configuration ci-dessus, vous pouvez déployer des VM et des conteneurs en utilisant les commandes Terraform habituelles :
-
-```bash
-terraform init
-terraform apply
-```
-
-Cette configuration vous permet de personnaliser les ressources de chaque VM ou conteneur, écrasant les valeurs par défaut définies dans le template.
-
-### Conclusion
-
-L'utilisation de templates Cloud-Init avec Proxmox et Terraform facilite le déploiement rapide et la configuration des environnements. N'hésitez pas à adapter cette documentation en fonction de vos besoins spécifiques.
+Cette documentation vous guide à travers le processus de création d'un template Cloud-Init sur Proxmox. Vous pouvez maintenant déployer des VMs rapidement avec des configurations personnalisées. Si vous avez des questions ou des problèmes, n'hésitez pas à demander de l'aide.
